@@ -8,7 +8,9 @@ import { LogoutButton } from "./logout-button";
 export default function DashboardPage() {
     const router = useRouter();
     const { data: session, status } = useSession();
+
     const [copied, setCopied] = useState(false);
+    const [sent, setSent] = useState(false);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -39,14 +41,16 @@ export default function DashboardPage() {
 
     async function copyToken() {
         await navigator.clipboard.writeText(tokenText);
+
         setCopied(true);
+
         setTimeout(() => setCopied(false), 1500);
     }
 
     async function sendTokenToBackend() {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/check-token`,
+                `/check-token`,
                 {
                     method: "GET",
                     credentials: "include",
@@ -59,6 +63,10 @@ export default function DashboardPage() {
             const data = await response.json();
 
             console.log(data);
+
+            setSent(true);
+
+            setTimeout(() => setSent(false), 1500);
 
         } catch (error) {
             console.log(error);
@@ -89,7 +97,9 @@ export default function DashboardPage() {
                         onClick={sendTokenToBackend}
                         type="button"
                     >
-                        Send Token To Backend
+                        {sent
+                            ? "Sent Successfully"
+                            : "Send Token To Backend"}
                     </button>
                 </div>
 
